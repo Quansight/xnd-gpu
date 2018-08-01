@@ -4,8 +4,11 @@ from xnd import xnd
 from functools import reduce
 import operator
 import types
+from distutils.sysconfig import get_python_lib
 
-gpu_mem = ctypes.CDLL('libgpu_mem.so')
+site_packages = get_python_lib()
+
+gpu_mem = ctypes.CDLL(f'{site_packages}/libgpu_mem.so')
 
 gpu_mem.new_array_float32.restype = ctypes.POINTER(ctypes.c_float)
 gpu_mem.new_array_float64.restype = ctypes.POINTER(ctypes.c_double)
