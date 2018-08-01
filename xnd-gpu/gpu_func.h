@@ -11,15 +11,15 @@ typedef float float32_t;
 typedef double float64_t;
 
 #ifdef __cplusplus
-    #define GPU_BINARY_PROTO(func, t0, t1, t2) extern "C" void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* x, t1##_t* y, t2##_t* r);
+    #define GPU_BINARY_PROTO(func, t0, t1, t2) extern "C" void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* in0, t1##_t* in1, t2##_t* out);
 #else
-    #define GPU_BINARY_PROTO(func, t0, t1, t2) void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* x, t1##_t* y, t2##_t* r);
+    #define GPU_BINARY_PROTO(func, t0, t1, t2) void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* in0, t1##_t* in1, t2##_t* out);
 #endif
 
 #ifdef __cplusplus
-    #define GPU_UNARY_PROTO(func, t0, t1) extern "C" void gpu_##func##_##t0##_##t1(int n, t0##_t* x, t1##_t* r);
+    #define GPU_UNARY_PROTO(func, t0, t1) extern "C" void gpu_##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out);
 #else
-    #define GPU_UNARY_PROTO(func, t0, t1) void gpu_##func##_##t0##_##t1(int n, t0##_t* x, t1##_t* r);
+    #define GPU_UNARY_PROTO(func, t0, t1) void gpu_##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out);
 #endif
 
 #define GPU_ALL_BINARY_PROTO(name)              \
@@ -163,66 +163,66 @@ GPU_ALL_UNARY_FLOAT_PROTO(nearbyint)
 
 #ifdef FAKE_GPU
 
-#define GPU_BINARY(func, t0, t1, t2)                                            \
-void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* x, t1##_t* y, t2##_t* r)    \
-{                                                                               \
-/*  for (int i = 0; i < n; i ++)                                                \
-        r[i] = func(x[i], y[i]);*/                                              \
-    int i;                                                                      \
-    for (i = 0; i < n-7; i += 8) {                                              \
-        r[i] = func(x[i], y[i]);                                                \
-        r[i+1] = func(x[i+1], y[i+1]);                                          \
-        r[i+2] = func(x[i+2], y[i+2]);                                          \
-        r[i+3] = func(x[i+3], y[i+3]);                                          \
-        r[i+4] = func(x[i+4], y[i+4]);                                          \
-        r[i+5] = func(x[i+5], y[i+5]);                                          \
-        r[i+6] = func(x[i+6], y[i+6]);                                          \
-        r[i+7] = func(x[i+7], y[i+7]);                                          \
-    }                                                                           \
-    for (; i < n; i++) {                                                        \
-        r[i] = func(x[i], y[i]);                                                \
-    }                                                                           \
+#define GPU_BINARY(func, t0, t1, t2)                                                \
+void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* in0, t1##_t* in1, t2##_t* out)  \
+{                                                                                   \
+/*  for (int i = 0; i < n; i ++)                                                    \
+        out[i] = func(in0[i], in1[i]);*/                                            \
+    int i;                                                                          \
+    for (i = 0; i < n-7; i += 8) {                                                  \
+        out[i] = func(in0[i], in1[i]);                                              \
+        out[i+1] = func(in0[i+1], in1[i+1]);                                        \
+        out[i+2] = func(in0[i+2], in1[i+2]);                                        \
+        out[i+3] = func(in0[i+3], in1[i+3]);                                        \
+        out[i+4] = func(in0[i+4], in1[i+4]);                                        \
+        out[i+5] = func(in0[i+5], in1[i+5]);                                        \
+        out[i+6] = func(in0[i+6], in1[i+6]);                                        \
+        out[i+7] = func(in0[i+7], in1[i+7]);                                        \
+    }                                                                               \
+    for (; i < n; i++) {                                                            \
+        out[i] = func(in0[i], in1[i]);                                              \
+    }                                                                               \
 }
 
 #define GPU_UNARY(func, t0, t1)                                 \
-void gpu_##func##_##t0##_##t1(int n, t0##_t* x, t1##_t* r)      \
+void gpu_##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out)  \
 {                                                               \
     for (int i = 0; i < n; i ++)                                \
-        r[i] = func(x[i]);                                      \
+        out[i] = func(in0[i]);                                  \
 }
 
 #else
 
-#define GPU_BINARY(func, t0, t1, t2)                                            \
-__global__                                                                      \
-void _##func##_##t0##_##t1##_##t2(int n, t0##_t* x, t1##_t* y, t2##_t* r)       \
-{                                                                               \
-    int index = blockIdx.x * blockDim.x + threadIdx.x;                          \
-    int stride = blockDim.x * gridDim.x;                                        \
-    for (int i = index; i < n; i += stride)                                     \
-        r[i] = func(x[i], y[i]);                                                \
-}                                                                               \
-void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* x, t1##_t* y, t2##_t* r)    \
-{                                                                               \
-    int blockSize = 256;                                                        \
-    int numBlocks = (n + blockSize - 1) / blockSize;                            \
-    _##func##_##t0##_##t1##_##t2<<<numBlocks, blockSize>>>(n, x, y, r);         \
+#define GPU_BINARY(func, t0, t1, t2)                                                \
+__global__                                                                          \
+void _##func##_##t0##_##t1##_##t2(int n, t0##_t* in0, t1##_t* in1, t2##_t* out)     \
+{                                                                                   \
+    int index = blockIdx.x * blockDim.x + threadIdx.x;                              \
+    int stride = blockDim.x * gridDim.x;                                            \
+    for (int i = index; i < n; i += stride)                                         \
+        out[i] = func(in0[i], in1[i]);                                              \
+}                                                                                   \
+void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* in0, t1##_t* in1, t2##_t* out)  \
+{                                                                                   \
+    int blockSize = 256;                                                            \
+    int numBlocks = (n + blockSize - 1) / blockSize;                                \
+    _##func##_##t0##_##t1##_##t2<<<numBlocks, blockSize>>>(n, in0, in1, out);       \
 }
 
-#define GPU_UNARY(func, t0, t1)                                 \
-__global__                                                      \
-void _##func##_##t0##_##t1(int n, t0##_t* x, t1##_t* r)         \
-{                                                               \
-    int index = blockIdx.x * blockDim.x + threadIdx.x;          \
-    int stride = blockDim.x * gridDim.x;                        \
-    for (int i = index; i < n; i += stride)                     \
-        r[i] = func(x[i]);                                      \
-}                                                               \
-void gpu_##func##_##t0##_##t1(int n, t0##_t* x, t1##_t* r)      \
-{                                                               \
-    int blockSize = 256;                                        \
-    int numBlocks = (n + blockSize - 1) / blockSize;            \
-    _##func##_##t0##_##t1<<<numBlocks, blockSize>>>(n, x, r);   \
+#define GPU_UNARY(func, t0, t1)                                     \
+__global__                                                          \
+void _##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out)         \
+{                                                                   \
+    int index = blockIdx.x * blockDim.x + threadIdx.x;              \
+    int stride = blockDim.x * gridDim.x;                            \
+    for (int i = index; i < n; i += stride)                         \
+        out[i] = func(in0[i]);                                      \
+}                                                                   \
+void gpu_##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out)      \
+{                                                                   \
+    int blockSize = 256;                                            \
+    int numBlocks = (n + blockSize - 1) / blockSize;                \
+    _##func##_##t0##_##t1<<<numBlocks, blockSize>>>(n, in0, out);   \
 }
 
 #endif

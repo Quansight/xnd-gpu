@@ -1,4 +1,8 @@
+import sys
+sys.path.append('../xnd-gpu')
+
 from xnd_gpu import xnd_gpu, gpu_synchro
+
 from gpu_func import gpu_add
 from xnd import xnd
 from gumath import functions as fn

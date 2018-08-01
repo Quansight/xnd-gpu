@@ -5,7 +5,7 @@ from functools import reduce
 import operator
 import types
 
-gpu_mem = ctypes.CDLL('./libgpu_mem.so')
+gpu_mem = ctypes.CDLL('libgpu_mem.so')
 
 gpu_mem.new_array_float32.restype = ctypes.POINTER(ctypes.c_float)
 gpu_mem.new_array_float64.restype = ctypes.POINTER(ctypes.c_double)
