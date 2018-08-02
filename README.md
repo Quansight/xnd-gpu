@@ -28,6 +28,7 @@ r = xnd_gpu(empty_like=a) # data is allocated in the GPU memory
 GPU functions live in the `gpu_func` module. Successive GPU function calls:
 - do not copy data back to the CPU,
 - are non-blocking.
+
 This allows for maximum performances. When CPU data access is needed,
 `gpu_synchro()` has to be called to ensure all the GPU computations are done.
 But the data still lives in the GPU memory. Thanks to the unified memory, it is
