@@ -1,4 +1,4 @@
-SITE_PACKAGES ?= `python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`
+SITE_PACKAGES ?= $(shell python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
 CC = gcc
 CFLAGS = -I$(SITE_PACKAGES)/xndtools/kernel_generator -I$(SITE_PACKAGES)/xnd -I$(SITE_PACKAGES)/ndtypes -I$(SITE_PACKAGES)/gumath
 ifeq ($(MAKECMDGOALS),cpu)
@@ -11,7 +11,7 @@ cpu gpu: libgpu_func-kernels.a gpu_func-python.c libgpu_mem.so
 	cp libgpu_mem.so $(SITE_PACKAGES)
 	rm -rf build
 	python setup.py install
-	echo Built for $(GPU) GPU
+	@echo Built for $(GPU) GPU
 
 ifeq ($(MAKECMDGOALS),cpu)
 libgpu_mem.so: gpu_mem.c
