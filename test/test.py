@@ -3,50 +3,102 @@ sys.path.append('../xnd-gpu')
 
 from xnd_gpu import xnd_gpu, gpu_synchro
 
-from gpu_func import gpu_add
+import gpu_func
 from xnd import xnd
 from gumath import functions as fn
 import gumath as gm
 import numpy as np
 from time import time
+from pandas import DataFrame
 
-times = 1_000
+binary_op = 'add', 'subtract', 'multiply', 'divide'
+unary_op = 'fabs','exp','exp2','expm1','log','log2','log10','log1p','logb','sqrt','cbrt','sin','cos','tan','asin','acos','atan','sinh','cosh','tanh','asinh','acosh','atanh','erf','erfc','lgamma','tgamma','ceil','floor','trunc','round','nearbyint'
+operations = {'binary': binary_op, 'unary': unary_op}
+
+times = 100
 size = 1_000_000
-shape = (size,)
 
-a = np.arange(size, dtype='float32').reshape(shape)
-b = np.ones_like(a)
+in0 = np.random.uniform(0, 1, size=size) #, dtype='float64')
+in1 = np.random.uniform(0, 1, size=size) #, dtype='float64')
 
-# GPU
+# binary operations
 
-x = xnd_gpu(from_buffer=a)
-y = xnd_gpu(from_buffer=b)
+xgin0 = xnd_gpu(from_buffer=in0)
+xgin1 = xnd_gpu(from_buffer=in1)
 
-r = xnd_gpu(empty_like=a)
+xgout = xnd_gpu(empty_like=in0)
 
-t0 = time()
+xin0 = xnd.from_buffer(in0)
+xin1 = xnd.from_buffer(in1)
 
-for i in range(times):
-    gpu_add(x, y, r)
-gpu_synchro()
+index = []
+xgtime = []
+xtime = []
+ntime = []
 
-t1 = time()
+for op_type in operations:
+    for op_name in operations[op_type]:
+        print(f'operation: {op_name}')
 
-print(f'GPU took {t1 - t0} seconds.')
+        # GPU
+        op = gpu_func.__getattribute__(f'gpu_{op_name}')
+        if op_type == 'binary':
+            args = xgin0, xgin1, xgout
+        else:
+            args = xgin0, xgout
+        t0 = time()
+        for i in range(times):
+            op(*args)
+        gpu_synchro()
+        t1 = time()
+        xgt = t1 - t0
+        xgtime.append(xgt)
+        print(f'GPU:   {xgt}')
 
-# CPU
+        # CPU
+        op = fn.__getattribute__(op_name)
+        if op_type == 'binary':
+            args = xin0, xin1
+        else:
+            args = xin0,
+        t0 = time()
+        for i in range(times):
+            xout = op(*args)
+        t1 = time()
+        xt = t1 - t0
+        xtime.append(xt)
+        print(f'CPU:   {xt}')
 
-x = xnd.from_buffer(a)
-y = xnd.from_buffer(b)
+        # NumPy
+        np_name = {'asin': 'arcsin', 'acos': 'arccos', 'atan': 'arctan', 'asinh': 'arcsinh', 'acosh': 'arccosh', 'atanh': 'arctanh','nearbyint': 'rint'}
+        if op_name in np_name:
+            op_name = np_name[op_name]
+        if op_name in np.__dir__():
+            op = np.__getattribute__(op_name)
+            if op_type == 'binary':
+                args = in0, in1
+            else:
+                args = in0,
+            t0 = time()
+            for i in range(times):
+                out = op(*args)
+            t1 = time()
+            nt = t1 - t0
+            ntime.append(nt)
+            print(f'NumPy: {nt}')
+        else:
+            ntime.append(0)
+            print(f'NumPy: NA')
 
-t0 = time()
+        print()
+        index.append(op_name)
 
-for i in range(times):
-    xr = fn.add(x, y)
-
-t1 = time()
-
-print(f'CPU took {t1 - t0} seconds.')
-
-assert (r == xr)
-print(r)
+        #print(gr)
+        #assert (r == gr)
+df = DataFrame({'XND-GPU': xgtime, 'XND': xtime, 'NumPy': ntime}, index=index)
+df = (1 / df).replace(np.inf ,0)
+df = df.div(df.max(axis=1), axis=0)
+df.to_pickle('benchmark.pkl')
+ax = df.plot.bar(title='Speed (1 is fastest)', figsize=(15, 5))
+fig = ax.get_figure()
+fig.savefig('benchmark.png')

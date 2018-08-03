@@ -124,9 +124,9 @@ typedef double float64_t;
 */  GPU_UNARY_PROTO(name, float64, float64)
 
 GPU_ALL_BINARY_PROTO(add)
-GPU_ALL_BINARY_PROTO(sub)
-GPU_ALL_BINARY_PROTO(mul)
-GPU_ALL_BINARY_PROTO(div)
+GPU_ALL_BINARY_PROTO(subtract)
+GPU_ALL_BINARY_PROTO(multiply)
+GPU_ALL_BINARY_PROTO(divide)
 
 GPU_ALL_UNARY_FLOAT_PROTO(fabs)
 GPU_ALL_UNARY_FLOAT_PROTO(exp)
@@ -319,9 +319,9 @@ void gpu_##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out)      \
     GPU_BINARY(name, float64, float64, float64)
 
 #define add(x, y) x + y
-#define sub(x, y) x - y
-#define mul(x, y) x * y
-#define div(x, y) x / y
+#define subtract(x, y) x - y
+#define multiply(x, y) x * y
+#define divide(x, y) x / y
 
 #define GPU_ALL_UNARY_FLOAT(name)        \
     GPU_UNARY(name##f, int8, float32)    \

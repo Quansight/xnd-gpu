@@ -21,6 +21,9 @@ libgpu_mem.so: gpu_mem.cu
 	nvcc -o libgpu_mem.so --compiler-options "-fPIC" --shared gpu_mem.cu
 endif
 
+gpu_func-kernels.cfg:
+	python write_cfg.py
+
 gpu_func-kernels.c: gpu_func-kernels.cfg
 	xnd_tools kernel gpu_func-kernels.cfg
 

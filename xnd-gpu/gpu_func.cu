@@ -1,9 +1,9 @@
 #include "gpu_func.h"
 
 GPU_ALL_BINARY(add)
-GPU_ALL_BINARY(sub)
-GPU_ALL_BINARY(mul)
-GPU_ALL_BINARY(div)
+GPU_ALL_BINARY(subtract)
+GPU_ALL_BINARY(multiply)
+GPU_ALL_BINARY(divide)
 
 GPU_ALL_UNARY_FLOAT(fabs)
 GPU_ALL_UNARY_FLOAT(exp)
