@@ -22,7 +22,7 @@ typedef double float64_t;
     #define GPU_UNARY_PROTO(func, t0, t1) void gpu_##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out);
 #endif
 
-#define GPU_ALL_BINARY_PROTO(name)              \
+#define GPU_ALL_BINARY_PROTO(name)                    \
     GPU_BINARY_PROTO(name, int8, int8, int8)          \
     GPU_BINARY_PROTO(name, int8, int16, int16)        \
     GPU_BINARY_PROTO(name, int8, int32, int32)        \
@@ -32,7 +32,7 @@ typedef double float64_t;
     GPU_BINARY_PROTO(name, int8, uint32, int64)       \
     GPU_BINARY_PROTO(name, int8, float32, float32)    \
     GPU_BINARY_PROTO(name, int8, float64, float64)    \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, int16, int8, int16)        \
     GPU_BINARY_PROTO(name, int16, int16, int16)       \
     GPU_BINARY_PROTO(name, int16, int32, int32)       \
@@ -42,7 +42,7 @@ typedef double float64_t;
     GPU_BINARY_PROTO(name, int16, uint32, int64)      \
     GPU_BINARY_PROTO(name, int16, float32, float32)   \
     GPU_BINARY_PROTO(name, int16, float64, float64)   \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, int32, int8, int32)        \
     GPU_BINARY_PROTO(name, int32, int16, int32)       \
     GPU_BINARY_PROTO(name, int32, int32, int32)       \
@@ -51,7 +51,7 @@ typedef double float64_t;
     GPU_BINARY_PROTO(name, int32, uint16, int32)      \
     GPU_BINARY_PROTO(name, int32, uint32, int64)      \
     GPU_BINARY_PROTO(name, int32, float64, float64)   \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, int64, int8, int64)        \
     GPU_BINARY_PROTO(name, int64, int16, int64)       \
     GPU_BINARY_PROTO(name, int64, int32, int64)       \
@@ -59,7 +59,7 @@ typedef double float64_t;
     GPU_BINARY_PROTO(name, int64, uint8, int64)       \
     GPU_BINARY_PROTO(name, int64, uint16, int64)      \
     GPU_BINARY_PROTO(name, int64, uint32, int64)      \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, uint8, int8, int16)        \
     GPU_BINARY_PROTO(name, uint8, int16, int16)       \
     GPU_BINARY_PROTO(name, uint8, int32, int32)       \
@@ -70,7 +70,7 @@ typedef double float64_t;
     GPU_BINARY_PROTO(name, uint8, uint64, uint64)     \
     GPU_BINARY_PROTO(name, uint8, float32, float32)   \
     GPU_BINARY_PROTO(name, uint8, float64, float64)   \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, uint16, int8, int32)       \
     GPU_BINARY_PROTO(name, uint16, int16, int32)      \
     GPU_BINARY_PROTO(name, uint16, int32, int32)      \
@@ -81,7 +81,7 @@ typedef double float64_t;
     GPU_BINARY_PROTO(name, uint16, uint64, uint64)    \
     GPU_BINARY_PROTO(name, uint16, float32, float32)  \
     GPU_BINARY_PROTO(name, uint16, float64, float64)  \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, uint32, int8, int64)       \
     GPU_BINARY_PROTO(name, uint32, int16, int64)      \
     GPU_BINARY_PROTO(name, uint32, int32, int64)      \
@@ -91,19 +91,19 @@ typedef double float64_t;
     GPU_BINARY_PROTO(name, uint32, uint32, uint32)    \
     GPU_BINARY_PROTO(name, uint32, uint64, uint64)    \
     GPU_BINARY_PROTO(name, uint32, float64, float64)  \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, uint64, uint8, uint64)     \
     GPU_BINARY_PROTO(name, uint64, uint16, uint64)    \
     GPU_BINARY_PROTO(name, uint64, uint32, uint64)    \
     GPU_BINARY_PROTO(name, uint64, uint64, uint64)    \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, float32, int8, float32)    \
     GPU_BINARY_PROTO(name, float32, int16, float32)   \
     GPU_BINARY_PROTO(name, float32, uint8, float32)   \
     GPU_BINARY_PROTO(name, float32, uint16, float32)  \
     GPU_BINARY_PROTO(name, float32, float32, float32) \
     GPU_BINARY_PROTO(name, float32, float64, float64) \
-                                                \
+                                                      \
     GPU_BINARY_PROTO(name, float64, int8, float64)    \
     GPU_BINARY_PROTO(name, float64, int16, float64)   \
     GPU_BINARY_PROTO(name, float64, int32, float64)   \
@@ -318,10 +318,10 @@ void gpu_##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out)      \
     GPU_BINARY(name, float64, float32, float64) \
     GPU_BINARY(name, float64, float64, float64)
 
-#define add(x, y) x + y
-#define subtract(x, y) x - y
-#define multiply(x, y) x * y
-#define divide(x, y) x / y
+#define add(x, y)       x + y
+#define subtract(x, y)  x - y
+#define multiply(x, y)  x * y
+#define divide(x, y)    x / y
 
 #define GPU_ALL_UNARY_FLOAT(name)        \
     GPU_UNARY(name##f, int8, float32)    \
