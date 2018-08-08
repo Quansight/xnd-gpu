@@ -20,6 +20,7 @@ size = 1_000_000
 
 in0 = np.random.uniform(0, 1, size=size) #, dtype='float64')
 in1 = np.random.uniform(0, 1, size=size) #, dtype='float64')
+dummy = np.empty_like(in0)
 
 # binary operations
 
@@ -50,6 +51,7 @@ for op_type in operations:
         for i in range(times):
             op(*args)
         gpu_synchro()
+        xgout.gpu_copy_to_buffer(dummy) # get data from GPU back to CPU
         t1 = time()
         xgt = t1 - t0
         xgtime.append(xgt)
