@@ -47,6 +47,9 @@ print(r) # data is copied from the GPU upon CPU access, thanks to unified memory
 
 ## Benchmark
 
+Each operation was run 1000 times on arrays of 1M `float64` elements, on the
+following hardware:
+
 - CPU: Intel Broadwell, 1 core at 3 GHz
 - GPU: Quadro P2000, 1024 CUDA cores at 1.48 GHz
 
