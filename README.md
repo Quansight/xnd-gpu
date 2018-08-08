@@ -45,7 +45,14 @@ gpu_synchro() # wait for all the GPU computations to finish
 print(r) # data is copied from the GPU upon CPU access, thanks to unified memory
 ```
 
-## Installation
+## Benchmark
+
+- CPU: Intel Broadwell, 1 core at 3 GHz
+- GPU: Quadro P2000, 1024 CUDA cores at 1.48 GHz
+
+![alt text](test/benchmark.png)
+
+## Install
 
 In the `xnd-gpu` directory:
 
