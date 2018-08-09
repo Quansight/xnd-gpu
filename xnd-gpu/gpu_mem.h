@@ -33,8 +33,6 @@ void copy_array_##t(t##_t* dst,t##_t* src, int n)               \
     memcpy(dst, src, n * sizeof(t##_t));                        \
 }
 
-void synchro();
-
 #else
 
 #define NEW_ARRAY(t)                            \
@@ -56,8 +54,6 @@ extern "C" void copy_array_##t(t##_t* dst,t##_t* src, int n)    \
 {                                                               \
     memcpy(dst, src, n * sizeof(t##_t));                        \
 }
-
-extern "C" void synchro();
 
 #endif
 

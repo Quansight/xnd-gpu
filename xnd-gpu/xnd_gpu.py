@@ -40,9 +40,6 @@ def delete(self):
         elif self.gpu_dtype == 'float64':
             gpu_mem.del_array_float64(self.gpu_addr)
 
-def gpu_synchro():
-    gpu_mem.synchro()
-
 def new(shape, dtype='float32'):
     '''Allocate on the GPU the necessary memory to hold an array of given
     shape and dtype.

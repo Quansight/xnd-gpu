@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../xnd-gpu')
 
-from xnd_gpu import xnd_gpu, gpu_synchro
+from xnd_gpu import xnd_gpu
 
 import gpu_func
 from xnd import xnd
@@ -50,7 +50,6 @@ for op_type in operations:
         t0 = time()
         for i in range(times):
             op(*args)
-        gpu_synchro()
         xgout.gpu_copy_to_buffer(dummy) # get data from GPU back to CPU
         t1 = time()
         xgt = t1 - t0

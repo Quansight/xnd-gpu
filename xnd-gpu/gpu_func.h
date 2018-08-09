@@ -207,6 +207,7 @@ void gpu_##func##_##t0##_##t1##_##t2(int n, t0##_t* in0, t1##_t* in1, t2##_t* ou
     int blockSize = 256;                                                            \
     int numBlocks = (n + blockSize - 1) / blockSize;                                \
     _##func##_##t0##_##t1##_##t2<<<numBlocks, blockSize>>>(n, in0, in1, out);       \
+    cudaDeviceSynchronize();                                                        \
 }
 
 #define GPU_UNARY(func, t0, t1)                                     \
@@ -223,6 +224,7 @@ void gpu_##func##_##t0##_##t1(int n, t0##_t* in0, t1##_t* out)      \
     int blockSize = 256;                                            \
     int numBlocks = (n + blockSize - 1) / blockSize;                \
     _##func##_##t0##_##t1<<<numBlocks, blockSize>>>(n, in0, out);   \
+    cudaDeviceSynchronize();                                        \
 }
 
 #endif
