@@ -8,18 +8,18 @@ from xnd import xnd
 from gumath import functions as fn
 import gumath as gm
 import numpy as np
+import scipy.special as sp
 from time import time
 from pandas import DataFrame
 
 binary_op = 'add', 'subtract', 'multiply', 'divide'
-unary_op = 'fabs','exp','exp2','expm1','log','log2','log10','log1p','logb','sqrt','cbrt','sin','cos','tan','asin','acos','atan','sinh','cosh','tanh','asinh','acosh','atanh','erf','erfc','lgamma','tgamma','ceil','floor','trunc','round','nearbyint'
+unary_op = 'fabs', 'exp', 'exp2', 'expm1', 'log', 'log2', 'log10', 'log1p', 'logb', 'sqrt', 'cbrt', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'sinh', 'cosh', 'tanh', 'asinh', 'acosh', 'atanh', 'erf', 'erfc', 'lgamma', 'tgamma', 'ceil', 'floor', 'trunc', 'round', 'nearbyint'
 operations = {'binary': binary_op, 'unary': unary_op}
 
-times = 100
-size = 1_000_000
+size = 10_000_000
 
-in0 = np.random.uniform(0, 1, size=size) #, dtype='float64')
-in1 = np.random.uniform(0, 1, size=size) #, dtype='float64')
+in0 = np.random.uniform(0, 1, size=size).astype('float64')
+in1 = np.random.uniform(0, 1, size=size).astype('float64')
 dummy = np.empty_like(in0)
 
 # binary operations
@@ -37,6 +37,21 @@ xgtime = []
 xtime = []
 ntime = []
 
+at_least = 10 # run at least 10 seconds
+
+def run(op, args, kwargs={}, at_least=10):
+    done = False
+    n = 0
+    t0 = time()
+    while not done:
+        for _ in range(100):
+            op(*args, **kwargs)
+            n += 1
+        t1 = time()
+        if t1 - t0 >= at_least:
+            done = True
+    return (t1 - t0) / n
+
 for op_type in operations:
     for op_name in operations[op_type]:
         print(f'operation: {op_name}')
@@ -47,12 +62,11 @@ for op_type in operations:
             args = xgin0, xgin1, xgout
         else:
             args = xgin0, xgout
-        t0 = time()
-        for i in range(times):
-            op(*args)
-        xgout.gpu_copy_to_buffer(dummy) # get data from GPU back to CPU
-        t1 = time()
-        xgt = t1 - t0
+        xgt = run(op, args, at_least=at_least)
+        #t0 = time()
+        #xgout.gpu_copy_to_buffer(dummy) # get data from GPU back to CPU after the series of functions
+        #t1 = time()
+        #xgt += t1 - t0
         xgtime.append(xgt)
         print(f'GPU:   {xgt}')
 
@@ -62,34 +76,36 @@ for op_type in operations:
             args = xin0, xin1
         else:
             args = xin0,
-        t0 = time()
-        for i in range(times):
-            xout = op(*args)
-        t1 = time()
-        xt = t1 - t0
+        xt = run(op, args, at_least=at_least)
         xtime.append(xt)
         print(f'CPU:   {xt}')
 
         # NumPy
-        np_name = {'asin': 'arcsin', 'acos': 'arccos', 'atan': 'arctan', 'asinh': 'arcsinh', 'acosh': 'arccosh', 'atanh': 'arctanh','nearbyint': 'rint'}
+        np_name = {'asin': 'arcsin', 'acos': 'arccos', 'atan': 'arctan', 'asinh': 'arcsinh', 'acosh': 'arccosh', 'atanh': 'arctanh','nearbyint': 'rint', 'lgamma': 'gammaln', 'tgamma': 'gamma', 'logb': 'log2'}
         if op_name in np_name:
             op_name = np_name[op_name]
+        package = None
         if op_name in np.__dir__():
-            op = np.__getattribute__(op_name)
+            package = np
+        elif op_name in sp.__dir__():
+            package = sp
+        if package is None:
+            ntime.append(0)
+            print(f'NumPy: NA')
+        else:
+            op = package.__getattribute__(op_name)
             if op_type == 'binary':
                 args = in0, in1
             else:
                 args = in0,
-            t0 = time()
-            for i in range(times):
-                out = op(*args)
-            t1 = time()
-            nt = t1 - t0
+            if package == np:
+                kwargs = {'out': dummy}
+            else:
+                kwargs = {}
+            #nt = run(op, args, kwargs=kwargs, at_least=at_least)
+            nt = run(op, args, at_least=at_least)
             ntime.append(nt)
             print(f'NumPy: {nt}')
-        else:
-            ntime.append(0)
-            print(f'NumPy: NA')
 
         print()
         index.append(op_name)

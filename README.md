@@ -47,8 +47,11 @@ print(r) # data is copied from the GPU upon CPU access, thanks to unified memory
 
 ## Benchmark
 
-Each operation was run 1000 times on arrays of 1M `float64` elements, on the
-following hardware:
+Each operation was run in a loop for at least 10 seconds on arrays of 10M
+`float64` elements. For XND-GPU, the data remains on the GPU (no copy between
+CPU and GPU). XND and NumPy/SciPy allocate memory for the result, but XND-GPU
+doesn't since it's preallocated and passed as argument. NumPy and SciPy don't
+use MKL. The following hardware was used:
 
 - CPU: Intel Broadwell, 1 core at 3 GHz
 - GPU: Quadro P2000, 1024 CUDA cores at 1.48 GHz

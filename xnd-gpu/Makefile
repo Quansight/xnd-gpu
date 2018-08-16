@@ -48,4 +48,4 @@ libgpu_func-kernels.a: gpu_func.o gpu_func-kernels.o xndtools.o
 	ar rcs libgpu_func-kernels.a gpu_func.o gpu_func-kernels.o xndtools.o
 
 clean:
-	rm -rf build *.so *.a *.o
+	rm -rf build *.so *.a *.o *.cfg
