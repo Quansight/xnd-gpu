@@ -15,7 +15,7 @@ if cudadir:
 module1 = Extension('gpu_func',
                     include_dirs = xnd_dirs,
                     libraries = ['gpu_func-kernels', 'ndtypes','gumath', 'xnd', 'cudart', 'stdc++'],
-                    library_dirs = ['.'] + xnd_dirs + cuda_dir
+                    library_dirs = ['.'] + xnd_dirs + cuda_dir,
                     sources = ['gpu_func-python.c'])
 
 setup (name = 'gpu_func',
