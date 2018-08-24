@@ -60,9 +60,11 @@ use MKL. The following hardware was used:
 
 ## Install
 
-In the `xnd-gpu` directory:
+Set the `CUDADIR` environment variable to the directory of your CUDA install,
+e.g. `/usr/local/cuda-9.2/lib64`, and type `make` in the `xnd-gpu` directory:
 
 ```bash
+$ export CUDADIR=/usr/local/cuda-9.2/lib64
 $ make
 ```
 
