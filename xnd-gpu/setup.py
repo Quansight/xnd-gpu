@@ -1,8 +1,12 @@
 from distutils.core import setup, Extension
 from distutils.sysconfig import get_python_lib
+import os
 
 site_packages = get_python_lib()
 lib_dirs = [f'{site_packages}/{i}' for i in ['ndtypes', 'gumath', 'xnd']]
+conda_prefix = os.environ.get('CONDA_PREFIX')
+if conda_prefix:
+    lib_dirs.append(f'{conda_prefix}/include')
 
 module1 = Extension('gpu_func',
                     include_dirs = lib_dirs,

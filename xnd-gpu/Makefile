@@ -1,6 +1,6 @@
 SITE_PACKAGES ?= $(shell python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
 CC = gcc
-CFLAGS = -I$(SITE_PACKAGES)/xndtools/kernel_generator -I$(SITE_PACKAGES)/xnd -I$(SITE_PACKAGES)/ndtypes -I$(SITE_PACKAGES)/gumath
+CFLAGS = -I$(SITE_PACKAGES)/xndtools/kernel_generator -I$(SITE_PACKAGES)/xnd -I$(SITE_PACKAGES)/ndtypes -I$(SITE_PACKAGES)/gumath -I$(CONDA_PREFIX)/include
 ifeq ($(MAKECMDGOALS),cpu)
 	GPU = fake
 else
